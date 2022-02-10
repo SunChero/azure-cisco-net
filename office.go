@@ -31,17 +31,26 @@ func GetOffice(ref string) []OfficeEndpoint {
 }
 
 func GetOfficeUrls(w http.ResponseWriter, r *http.Request) {
-	var ips []string
+	// for name, values := range r.Header {
+	// 	for _, value := range values {
+	// 		fmt.Println(name, value)
+	// 	}
+	// }
+
+	p, _ := getIP(r)
+	fmt.Println(p)
+	var u []string
 	eps := GetOffice(officeRef)
 	w.Header().Add("Content-Type", "Application/json")
 	for _, v := range eps {
 		if v.Urls != nil {
 			for _, str := range v.Urls {
-				ips = append(ips, str)
+				u = append(u, str)
 			}
 		}
 	}
-	fmt.Fprint(w, ips)
+	pac := parsePAC(u)
+	w.Write([]byte(pac))
 }
 
 // func GetOffice(w http.ResponseWriter, r *http.Request) {
@@ -73,10 +82,8 @@ func GetOfficeCisco(w http.ResponseWriter, r *http.Request) {
 	var ips []string
 	var list = make(map[string][]string)
 	eps := GetOffice(officeRef)
-
 	w.Header().Add("Content-Type", "Application/json")
 	for _, v := range eps {
-
 		name := fmt.Sprintf("O365.%v.%v", v.Id, v.ServiceArea)
 		if v.Ips != nil {
 			for _, str := range v.Ips {
@@ -92,9 +99,7 @@ func GetOfficeCisco(w http.ResponseWriter, r *http.Request) {
 		}
 		fmt.Println((list))
 		ips = ips[:0]
-
 	}
 	str := parseASArule(list)
-
 	w.Write([]byte(str.String()))
 }
