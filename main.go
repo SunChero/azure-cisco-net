@@ -9,7 +9,8 @@ var officeRef = "https://endpoints.office.com/endpoints/worldwide?clientrequesti
 var azureRef = "https://download.microsoft.com/download/7/1/D/71D86715-5596-4529-9B13-DA13A5DE5B63/ServiceTags_Public_20220207.json"
 
 func main() {
-
+	fs := http.FileServer(http.Dir("./frontend/build"))
+	http.Handle("/", fs)
 	http.HandleFunc("/office/ipv4", GetOfficeIpv4)
 	http.HandleFunc("/office/ipv4/cisco", GetOfficeCisco)
 	http.HandleFunc("/office/urls", GetOfficeUrls)

@@ -16,6 +16,7 @@ type AzureEndpoint struct {
 		Name       string `json:"name"`
 		Properties struct {
 			Region          string   `json:"region"`
+			RegionId        int      `json:"regionId"`
 			AddressPrefixes []string `json:"addressPrefixes"`
 		} `json:"properties"`
 	} `json:"values"`
@@ -55,6 +56,7 @@ func GetAzureIpv4(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetAzureCisco(w http.ResponseWriter, r *http.Request) {
+
 	var ips []string
 	var list = make(map[string][]string)
 	eps := GetAzure(azureRef)
@@ -62,7 +64,7 @@ func GetAzureCisco(w http.ResponseWriter, r *http.Request) {
 
 	for _, v := range eps.Values {
 		//access to rules name
-		name := fmt.Sprintf("AZ.%v", v.Name)
+		name := fmt.Sprintf("AZ.%v.%v", v.Properties.RegionId, v.Name)
 		if v.Properties.AddressPrefixes != nil {
 			for _, str := range v.Properties.AddressPrefixes {
 				if !strings.Contains(str, ":") { // filter ipv6
@@ -75,6 +77,14 @@ func GetAzureCisco(w http.ResponseWriter, r *http.Request) {
 		list[name] = ips
 		ips = ips[:0]
 
+	}
+	key, ok := r.URL.Query()["search"]
+	if ok {
+		for k, _ := range list {
+			if !strings.Contains(strings.ToUpper(k), strings.ToUpper(key[0])) {
+				delete(list, k)
+			}
+		}
 	}
 	str := parseASArule(list)
 
