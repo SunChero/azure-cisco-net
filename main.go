@@ -15,6 +15,15 @@ func main() {
 	http.HandleFunc("/office/urls", GetOfficeUrls)
 	http.HandleFunc("/azure/ipv4", GetAzureIpv4)
 	http.HandleFunc("/azure/ipv4/cisco", GetAzureCisco)
+	log.Println("Server starting on :8080")
+	log.Println("Current Endpoints")
+	log.Println("/office/ipv4 ")
+	log.Println("/office/ipv4/cisco ")
+	log.Println("/azure/ipv4 ")
+	log.Println("/azure/ipv4/cisco")
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		log.Fatalf("Cant startup Server: %v", err)
+	}
+
 }
